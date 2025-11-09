@@ -1,4 +1,12 @@
 <div class="container-fluid py-4 bg-light min-vh-100">
+    <!-- Success/Error Messages -->
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <!-- Header -->
     <div class="bg-primary text-white shadow rounded-3 p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center">
@@ -27,12 +35,20 @@
                 <input type="text" class="form-control border-start-0 ps-0" placeholder="Cari catatan keuangan..." wire:model.live="search">
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <select class="form-select form-select-lg shadow-sm" wire:model.live="filterJenis">
-                <option value="">� Semua Transaksi</option>
+                <option value=""> Semua Transaksi</option>
                 <option value="pemasukan">💰 Pemasukan</option>
-                <option value="pengeluaran">� Pengeluaran</option>
+                <option value="pengeluaran"> Pengeluaran</option>
             </select>
+        </div>
+        <div class="col-md-2">
+            <input type="date" class="form-control form-control-lg shadow-sm" wire:model.live="filterTanggalFrom" title="Filter berdasarkan tanggal">
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-secondary btn-lg shadow-sm w-100" wire:click="resetFilters" title="Reset Filter">
+                <i class="fas fa-refresh"></i>
+            </button>
         </div>
     </div>
 
@@ -133,19 +149,19 @@
                             </td>
                             <td class="py-3 text-center">
                                 <div class="btn-group">
-                                    <button class="btn btn-warning btn-sm" 
-                                        wire:click="prepareEditFinance({{ $finance->id }})" 
-                                        data-bs-toggle="modal" 
+                                    <button class="btn btn-warning btn-sm"
+                                        wire:click="prepareEditFinance({{ $finance->id }})"
+                                        data-bs-toggle="modal"
                                         data-bs-target="#editFinanceModal">
                                         <i class="fas fa-edit me-1"></i> Edit
                                     </button>
-                                    <a href="/app/finance/{{ $finance->id }}" 
+                                    <a href="/app/finance/{{ $finance->id }}"
                                         class="btn btn-info btn-sm">
                                         <i class="fas fa-eye me-1"></i> Detail
                                     </a>
-                                    <button class="btn btn-danger btn-sm" 
-                                        wire:click="prepareDeleteFinance({{ $finance->id }})" 
-                                        data-bs-toggle="modal" 
+                                    <button class="btn btn-danger btn-sm"
+                                        wire:click="prepareDeleteFinance({{ $finance->id }})"
+                                        data-bs-toggle="modal"
                                         data-bs-target="#deleteFinanceModal">
                                         <i class="fas fa-trash me-1"></i> Hapus
                                     </button>
@@ -171,10 +187,15 @@
             </div>
         </div>
         <div class="card-footer bg-white py-3">
-            {{ $finances->links() }}    <!-- ✅ Modal Add / Edit / Delete / Edit Cover -->
-    @include('components.modals.finances.add')
-    @include('components.modals.finances.edit')
-    @include('components.modals.finances.delete')
-    @include('components.modals.finances.edit-cover')
+            {{ $finances->links() }}
+        </div>
+    </div>
 
+    <!-- ✅ Modal Add / Edit / Delete / Edit Cover -->
+    <div>
+        @include('components.modals.finances.add')
+        @include('components.modals.finances.edit')
+        @include('components.modals.finances.delete')
+        @include('components.modals.finances.edit-cover')
+    </div>
 </div>

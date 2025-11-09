@@ -17,6 +17,7 @@ class FinanceLivewire extends Component
 
     public $search = '';
     public $filterJenis = '';
+    public $filterTanggalFrom = ''; // Akan digunakan untuk filter tanggal spesifik
     public $auth;
 
     // Form ADD
@@ -45,6 +46,19 @@ class FinanceLivewire extends Component
         $this->resetPage();
     }
 
+    public function updatingFilterTanggalFrom()
+    {
+        $this->resetPage();
+    }
+
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->filterJenis = '';
+        $this->filterTanggalFrom = '';
+        $this->resetPage();
+    }
+
     public function render()
     {
         $query = Finance::where('user_id', Auth::id());
@@ -55,6 +69,11 @@ class FinanceLivewire extends Component
 
         if ($this->filterJenis) {
             $query->where('jenis', $this->filterJenis);
+        }
+
+        // Mengubah logika filter tanggal untuk mencari tanggal spesifik
+        if ($this->filterTanggalFrom) { 
+            $query->whereDate('tanggal', $this->filterTanggalFrom);
         }
 
         $finances = $query->orderBy('tanggal', 'desc')
@@ -92,7 +111,7 @@ class FinanceLivewire extends Component
             'totalPengeluaran' => $totalPengeluaran,
             'totalSaldo' => $totalSaldo,
             'chartData' => $chartData,
-        ])->layout('layouts.app');
+        ]);
     }
 
     // ADD
@@ -119,8 +138,9 @@ class FinanceLivewire extends Component
 
         $this->reset(['addJudul', 'addNominal', 'addJenis', 'addTanggal', 'addCover']);
 
-        $this->dispatch('alertSuccess', message: 'Data berhasil ditambahkan!');
         $this->dispatch('closeModal', id: 'addFinanceModal');
+
+        return redirect('/app/home')->with('success', 'Data berhasil ditambahkan!');
     }
 
     // PREP EDIT
@@ -165,6 +185,7 @@ class FinanceLivewire extends Component
 
         $this->reset(['editFinanceId', 'editJudul', 'editNominal', 'editJenis', 'editTanggal']);
         $this->dispatch('closeModal', id: 'editFinanceModal');
+        $this->dispatch('show-toast', message: 'Data berhasil diubah!');
     }
 
     // PREP DELETE
@@ -193,7 +214,12 @@ class FinanceLivewire extends Component
             ->where('user_id', $this->auth->id)
             ->first();
 
-        if ($finance) $finance->delete();
+        if ($finance) {
+            $finance->delete();
+            $this->dispatch('show-toast', message: 'Data berhasil dihapus!');
+        } else {
+            $this->dispatch('show-toast', message: 'Data gagal dihapus!', error: true);
+        }
         $this->reset(['deleteFinanceId', 'deleteFinanceTitle', 'deleteConfirmTitle']);
         $this->dispatch('closeModal', id: 'deleteFinanceModal');
     }
@@ -219,6 +245,7 @@ class FinanceLivewire extends Component
         $finance->update(['cover' => $path]);
 
         $this->reset(['editCoverFinanceFile']);
+        session()->flash('success', 'Cover berhasil diubah!');
         $this->dispatch('closeModal', id: 'editFinanceCoverModal');
     }
 }

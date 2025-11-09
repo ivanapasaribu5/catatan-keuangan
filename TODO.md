@@ -1,0 +1,3 @@
+-   [x] Add date filter inputs (from and to) in the search & filter section of finance-livewire.blade.php
+-   [x] Adjust the grid layout to accommodate the new inputs (e.g., col-md-3 for each)
+-   [x] Test the date filters and ensure notifications work properly
