@@ -6,17 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::table('finances', function (Blueprint $table) {
-            $table->date('tanggal')->nullable()->after('nominal');
+            // Cek dulu apakah kolom sudah ada (mencegah duplicate column error)
+            if (!Schema::hasColumn('finances', 'tanggal')) {
+                $table->date('tanggal')->nullable(); // hapus ->after('nominal') jika pakai PostgreSQL
+            }
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::table('finances', function (Blueprint $table) {
-            $table->dropColumn('tanggal');
+            if (Schema::hasColumn('finances', 'tanggal')) {
+                $table->dropColumn('tanggal');
+            }
         });
     }
 };
